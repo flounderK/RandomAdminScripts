@@ -2,7 +2,8 @@
 
 VNCUSER="root"
 apt-get update
-apt-get install -y vnc4server tigervnc-common tigervnc-standalone-server
+apt-get install -y vnc4server tigervnc-common tigervnc-standalone-server \
+	gnome-panel metacity gnome-settings-daemon nautilus gnome-terminal
 echo "password" | vncpasswd -f > /opt/pass-file
 xhost +si:localuser:root
 
@@ -25,7 +26,6 @@ ExecStop=/usr/bin/vncserver -kill %i
 WantedBy=multi-user.target
 EOF
 ) > /etc/systemd/system/vncserver@:1.service
-
 
 systemctl daemon-reload
 systemctl enable vncserver@:1.service --now
