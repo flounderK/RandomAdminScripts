@@ -1,11 +1,37 @@
 #!/bin/bash
 
-VNCUSER="root"
+VNCUSER="foo"
+useradd -m $VNCUSER
+mkdir -p /home/$VNCUSER/.vnc
+touch /home/$VNCUSER/.Xauthority
+chmod +x /home/$VNCUSER/.Xauthority
+chown $VNCUSER:$VNCUSER /home/$VNCUSER/.Xauthority
+
+
+(
+cat <<'EOF'
+#!/bin/bash
+export XKL_XMODMAP_DISABLE=1
+# unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && exec $HOME/.Xresources
+xsetroot -solid grey
+vncconfig -iconic &
+metacity &
+startxfce4 &
+EOF
+) > /home/$VNCUSER/.vnc/xstartup
+chmod +x /home/$VNCUSER/.vnc/xstartup
+
 apt-get update
 apt-get install -y vnc4server tigervnc-common tigervnc-standalone-server \
-	gnome-panel metacity gnome-settings-daemon nautilus gnome-terminal
-echo "password" | vncpasswd -f > /opt/pass-file
-xhost +si:localuser:root
+	 metacity nautilus xfce4-session xfce4-wmdock-plugin xfce4-terminal
+echo "password" | vncpasswd -f > /home/$VNCUSER/.vnc/passwd
+xhost +si:localuser:$VNCUSER
+
+chown -R $VNCUSER:$VNCUSER /home/$VNCUSER/.vnc
 
 (
 cat <<'EOF'
@@ -15,7 +41,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-User=foo
+User=$VNCUSER
 PAMName=login
 PIDFile=/home/%u/.vnc/%H%i.pid
 ExecStartPre=/bin/sh -c '/usr/bin/vncserver -kill %i > /dev/null 2>&1 || :'
