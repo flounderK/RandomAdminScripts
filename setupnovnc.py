@@ -28,9 +28,12 @@ def install_systemd_service(command, servicename):
 
 
 os.system("(apt-get update || true) && "
-          "apt-get install -y vnc4server")
+          "apt-get install -y vnc4server tigervnc-common "
+          "tigervnc-standalone-server")
 os.system('echo "password" | vncpasswd -f > /opt/pass-file')
-install_systemd_service("/usr/bin/x0vncserver -PasswordFile /opt/pass-file",
+os.system('xhost +si:localuser:root')
+install_systemd_service("/usr/bin/x0vncserver -PasswordFile /opt/pass-file "
+                        "-display :0",
                         "vnc")
 
 os.system("git clone https://github.com/novnc/noVNC.git /opt/noVNC")
