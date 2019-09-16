@@ -1,7 +1,7 @@
 #!/bin/bash
 
-VNCUSER="foo"
-useradd -m $VNCUSER
+VNCUSER="user"
+# useradd -m $VNCUSER
 mkdir -p /home/$VNCUSER/.vnc
 touch /home/$VNCUSER/.Xauthority
 chmod +x /home/$VNCUSER/.Xauthority
@@ -9,7 +9,7 @@ chown $VNCUSER:$VNCUSER /home/$VNCUSER/.Xauthority
 
 
 (
-cat <<'EOF'
+cat <<EOF
 #!/bin/bash
 export XKL_XMODMAP_DISABLE=1
 # unset SESSION_MANAGER
@@ -34,7 +34,7 @@ xhost +si:localuser:$VNCUSER
 chown -R $VNCUSER:$VNCUSER /home/$VNCUSER/.vnc
 
 (
-cat <<'EOF'
+cat <<EOF
 [Unit]
 Description=Remote desktop service (VNC)
 After=syslog.target network.target
